@@ -96,49 +96,82 @@ const initialSeatData = buildSeats("screen-1");
 const expectedCounts = verifySeatData(initialSeatData);
 
 try {
-  await prisma.$transaction(async (transaction) => {
-    const theatre = await transaction.theatre.upsert({
-      where: { id: "theatre-vasundhara-70mm" },
-      update: { name: "Vasundhara Theatre 70MM" },
-      create: { id: "theatre-vasundhara-70mm", name: "Vasundhara Theatre 70MM" },
-    });
-
-    const screen = await transaction.screen.upsert({
-      where: { theatreId_name: { theatreId: theatre.id, name: "Screen 1" } },
-      update: {},
-      create: { name: "Screen 1", theatreId: theatre.id },
-    });
-
-    const seats = initialSeatData.map(({ screenId: _screenId, ...seat }) => ({
-      ...seat,
-      screenId: screen.id,
-    }));
-
-    for (const seat of seats) {
-      await transaction.seat.upsert({
-        where: { screenId_seatCode: { screenId: screen.id, seatCode: seat.seatCode } },
-        update: {
-          category: seat.category,
-          row: seat.row,
-          seatNumber: seat.seatNumber,
-          isActive: true,
-        },
-        create: seat,
-      });
-    }
-
-    const [total, balcony, firstClass] = await Promise.all([
-      transaction.seat.count({ where: { screenId: screen.id } }),
-      transaction.seat.count({ where: { screenId: screen.id, category: "BALCONY" } }),
-      transaction.seat.count({ where: { screenId: screen.id, category: "FIRST_CLASS" } }),
-    ]);
-
-    if (total !== expectedCounts.total || balcony !== expectedCounts.balcony || firstClass !== expectedCounts.firstClass) {
-      throw new Error(`Database seat count mismatch: total=${total}, balcony=${balcony}, firstClass=${firstClass}`);
-    }
-
-    console.log(`Seed verification: total=${total}, balcony=${balcony}, firstClass=${firstClass}`);
+  // Neon pooler (PgBouncer transaction mode) cannot reliably start Prisma
+  // interactive transactions ($transaction(async ...)), which caused P2028.
+  const theatre = await prisma.theatre.upsert({
+    where: { id: "theatre-vasundhara-70mm" },
+    update: { name: "Vasundhara Theatre 70MM" },
+    create: { id: "theatre-vasundhara-70mm", name: "Vasundhara Theatre 70MM" },
   });
+
+  const screen = await prisma.screen.upsert({
+    where: { theatreId_name: { theatreId: theatre.id, name: "Screen 1" } },
+    update: {},
+    create: {
+      id: "screen-vasundhara-1",
+      name: "Screen 1",
+      theatreId: theatre.id,
+    },
+  });
+
+  const seats = initialSeatData.map(({ screenId: _screenId, ...seat }) => ({
+    ...seat,
+    screenId: screen.id,
+  }));
+
+  const existingSeats = await prisma.seat.findMany({
+    where: { screenId: screen.id },
+    select: {
+      seatCode: true,
+      category: true,
+      row: true,
+      seatNumber: true,
+      isActive: true,
+    },
+  });
+  const existingByCode = new Map(existingSeats.map((seat) => [seat.seatCode, seat]));
+
+  const seatsToCreate = seats.filter((seat) => !existingByCode.has(seat.seatCode));
+  const seatsToUpdate = seats.filter((seat) => {
+    const existing = existingByCode.get(seat.seatCode);
+    return (
+      existing &&
+      (existing.category !== seat.category ||
+        existing.row !== seat.row ||
+        existing.seatNumber !== seat.seatNumber ||
+        existing.isActive !== true)
+    );
+  });
+
+  if (seatsToCreate.length > 0) {
+    await prisma.seat.createMany({ data: seatsToCreate });
+  }
+
+  for (const seat of seatsToUpdate) {
+    await prisma.seat.update({
+      where: { screenId_seatCode: { screenId: screen.id, seatCode: seat.seatCode } },
+      data: {
+        category: seat.category,
+        row: seat.row,
+        seatNumber: seat.seatNumber,
+        isActive: true,
+      },
+    });
+  }
+
+  const [total, balcony, firstClass] = await Promise.all([
+    prisma.seat.count({ where: { screenId: screen.id } }),
+    prisma.seat.count({ where: { screenId: screen.id, category: "BALCONY" } }),
+    prisma.seat.count({ where: { screenId: screen.id, category: "FIRST_CLASS" } }),
+  ]);
+
+  if (total !== expectedCounts.total || balcony !== expectedCounts.balcony || firstClass !== expectedCounts.firstClass) {
+    throw new Error(`Database seat count mismatch: total=${total}, balcony=${balcony}, firstClass=${firstClass}`);
+  }
+
+  console.log(
+    `Seed verification: theatre=${theatre.id}, screen=${screen.id}, total=${total}, balcony=${balcony}, firstClass=${firstClass}`,
+  );
 } finally {
   await prisma.$disconnect();
 }

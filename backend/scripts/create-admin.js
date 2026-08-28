@@ -89,11 +89,9 @@ async function main() {
   const environment = readRequiredEnvironment();
   validateDistinctIdentities(environment);
 
-  const results = await prisma.$transaction(async (transaction) => {
-    const admin = await createOrUpdateUser(transaction, "ADMIN", environment.admin);
-    const manager = await createOrUpdateUser(transaction, "THEATRE_MANAGER", environment.manager);
-    return { admin, manager };
-  });
+  const admin = await createOrUpdateUser(prisma, "ADMIN", environment.admin);
+  const manager = await createOrUpdateUser(prisma, "THEATRE_MANAGER", environment.manager);
+  const results = { admin, manager };
 
   for (const { role, action, user } of [
     { role: "ADMIN", ...results.admin },
