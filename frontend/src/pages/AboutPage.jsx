@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 export default function AboutPage() {
   return (
     <main className="about-page page-shell">
+      {/* Hero */}
       <section className="about-hero">
         <span className="eyebrow">About Vasundhara Theatre</span>
 
@@ -15,6 +16,7 @@ export default function AboutPage() {
         </p>
       </section>
 
+      {/* Theatre Information */}
       <section className="about-content">
         <div className="about-card">
           <span className="eyebrow">Our Story</span>
@@ -24,7 +26,8 @@ export default function AboutPage() {
           <p>
             Vasundhara Theatre 70MM is a historic cinema theatre located in
             Bhongir, Telangana. Established in 1994, the theatre was
-            inaugurated by Superstar Nagarjuna with the movie Brothers.
+            inaugurated by Superstar Nagarjuna with the movie{" "}
+            <strong>Brothers</strong>.
           </p>
 
           <p>
@@ -41,7 +44,7 @@ export default function AboutPage() {
 
           <p>
             Enjoy an immersive big-screen movie experience at Vasundhara
-            Theatre 70MM, located opposite the Old Police Station in Bhongir.
+            Theatre 70MM, located in Bhongir, Telangana.
           </p>
         </div>
 
@@ -69,10 +72,13 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Highlights */}
       <section className="about-content">
         <div className="about-card">
           <span className="eyebrow">Established</span>
+
           <h2>1994</h2>
+
           <p>
             A long-standing cinema destination serving movie lovers in
             Bhongir.
@@ -80,8 +86,21 @@ export default function AboutPage() {
         </div>
 
         <div className="about-card">
+          <span className="eyebrow">Inauguration</span>
+
+          <h2>Superstar Nagarjuna</h2>
+
+          <p>
+            The theatre was inaugurated by Superstar Nagarjuna with the movie
+            <strong> Brothers</strong>.
+          </p>
+        </div>
+
+        <div className="about-card">
           <span className="eyebrow">Location</span>
+
           <h2>Bhongir, Telangana</h2>
+
           <p>
             Opposite the Old Police Station, Bhongir, Telangana.
           </p>
@@ -90,22 +109,60 @@ export default function AboutPage() {
             className="button"
             href="https://www.google.com/maps?q=17.5105308,78.8886513"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             Open in Google Maps <span aria-hidden="true">→</span>
           </a>
         </div>
+
+        <div className="about-card">
+          <span className="eyebrow">Movie Experience</span>
+
+          <h2>Big Screen Entertainment</h2>
+
+          <p>
+            A cinema experience for action, comedy, romance, and family
+            entertainment.
+          </p>
+        </div>
       </section>
 
+      {/* Legacy */}
+      <section className="about-content">
+        <div className="about-card">
+          <span className="eyebrow">Our Legacy</span>
+
+          <h2>Serving Movie Lovers for Generations</h2>
+
+          <p>
+            From its beginning in 1994 to today, Vasundhara Theatre has
+            remained a familiar destination for movie lovers in Bhongir.
+          </p>
+        </div>
+
+        <div className="about-card">
+          <span className="eyebrow">Our Platform</span>
+
+          <h2>Simple & Convenient Booking</h2>
+
+          <p>
+            Our online platform makes it easy to browse movies, choose a show,
+            select available seats, and manage your booking details.
+          </p>
+        </div>
+      </section>
+
+      {/* CTA */}
       <section className="about-cta">
         <h2>Ready to watch a movie?</h2>
 
         <p>
-          Explore the latest movies, choose your show, and book your seats.
+          Explore the latest movies, choose your show, and book your seats at
+          Vasundhara Theatre 70MM.
         </p>
 
         <Link className="button" to="/">
-          Browse movies <span aria-hidden="true">→</span>
+          Browse Movies <span aria-hidden="true">→</span>
         </Link>
       </section>
     </main>
