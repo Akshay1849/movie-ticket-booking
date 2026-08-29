@@ -105,14 +105,15 @@ export default function AboutPage() {
             Opposite the Old Police Station, Bhongir, Telangana.
           </p>
 
-          <a
-            className="button"
-            href="https://www.google.com/maps?q=17.5105308,78.8886513"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Open in Google Maps <span aria-hidden="true">→</span>
-          </a>
+<a
+  className="button"
+  href="https://www.google.com/maps/place/Vasundhara+Theatre+-+Bhuvanagiri/@17.5105307,78.8837804,17z/data=!3m1!4b1!4m6!3m5!1s0x3bcb6fb20bd9791d:0x718d5fe24a0e29dc!8m2!3d17.5105308!4d78.8886513!16s%2Fg%2F1vyxgw7m"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Open in Google Maps <span aria-hidden="true">→</span>
+</a>
+         
         </div>
 
         <div className="about-card">
